@@ -1,25 +1,49 @@
-﻿# Virtual environments
+# Ignore everything by default. Only the explicit whitelist below is uploaded.
+*
+
+# Keep repository metadata and the cleaned crawler script.
+!.gitignore
+!crawler_clean.py
+!requirements.txt
+
+# Keep exported data and static assets.
+!data/
+!data/**
+!static/
+!static/**
+
+# Never upload local secrets, credentials, cookies, or environment files.
+secret*
+*secret*
+*.secret
+.env
+.env.*
+*.env
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.cer
+*.token
+*.cookies
+cookies*
+qq_music_profile/
+
+# Never upload generated caches, virtual environments, editor files, or logs.
 .venv/
 venv/
 env/
 ENV/
-
-# Python cache/build output
 __pycache__/
 *.py[cod]
 *$py.class
 build/
 dist/
 *.egg-info/
-
-# Jupyter
 .ipynb_checkpoints/
-
-# Local/editor files
 .vscode/
 .idea/
 *.log
-
-# OS files
 .DS_Store
 Thumbs.db

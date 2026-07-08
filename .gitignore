@@ -1,18 +1,4 @@
-# Ignore everything by default. Only the explicit whitelist below is uploaded.
-*
-
-# Keep repository metadata and the cleaned crawler script.
-!.gitignore
-!crawler_clean.py
-!requirements.txt
-
-# Keep exported data and static assets.
-!data/
-!data/**
-!static/
-!static/**
-
-# Never upload local secrets, credentials, cookies, or environment files.
+# Local secrets and credentials
 secret*
 *secret*
 *.secret
@@ -30,20 +16,27 @@ secret*
 cookies*
 qq_music_profile/
 
-# Never upload generated caches, virtual environments, editor files, or logs.
-.venv/
-venv/
-env/
-ENV/
+# Python caches and build output
 __pycache__/
 *.py[cod]
 *$py.class
 build/
 dist/
 *.egg-info/
-.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Local editor, OS, and notes
 .vscode/
 .idea/
 *.log
 .DS_Store
 Thumbs.db
+structure.txt

@@ -1,0 +1,619 @@
+/*定义全局变量*/
+:root {
+    --page-bg: #f4f6f8;
+    --surface: #ffffff;
+    --text: #18212a;
+    --muted: #68737f;
+    --border: #d7dde3;
+    --primary: #1769aa;
+    --primary-hover: #0f5288;
+    --danger: #b42318;
+}
+
+* {
+    box-sizing: border-box;
+}
+/*页面整体基础样式*/
+body {
+    margin: 0;
+    background: var(--page-bg);
+    color: var(--text);
+    font-family: Arial, "Microsoft YaHei", sans-serif;
+    line-height: 1.6;
+}
+/*所有链接的颜色*/
+a {
+    color: var(--primary);
+}
+/*表单元素和页面字体保持一致*/
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(24, 29, 38, 0.98),
+            rgba(31, 37, 48, 0.96)
+        );
+
+    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.12);
+}
+
+/*浏览器支持背景模糊时增强质感*/
+@supports (backdrop-filter: blur(16px)) {
+    .site-header {
+        background: rgba(27, 33, 43, 0.88);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+}
+
+.site-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+
+    width: min(1120px, calc(100% - 48px));
+    min-height: 72px;
+    margin: 0 auto;
+    padding: 10px 0;
+}
+
+/*标签区域*/
+.site-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+
+    flex: 0 0 auto;
+
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.site-brand:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.site-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 13px;
+
+    background: linear-gradient(135deg, #2275b9, #5b8def);
+    color: #ffffff;
+
+    box-shadow:
+        0 8px 18px rgba(23, 105, 170, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24);
+
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.site-brand-text {
+    display: grid;
+    gap: 1px;
+}
+
+.site-brand-text strong {
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+}
+
+.site-brand-text small {
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+/* 导航链接区域 */
+.site-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.site-nav-links a {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+    padding: 0 17px;
+
+    border: 1px solid transparent;
+    border-radius: 12px;
+
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+
+    transition:
+        color 160ms ease,
+        background-color 160ms ease,
+        border-color 160ms ease,
+        transform 160ms ease;
+}
+
+.site-nav-links a:hover {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.07);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+/* 当前页面 */
+.site-nav-links a.is-active {
+    border-color: rgba(109, 174, 229, 0.22);
+    background: rgba(23, 105, 170, 0.22);
+    color: #ffffff;
+}
+
+.site-nav-links a.is-active::after {
+    position: absolute;
+    right: 17px;
+    bottom: 6px;
+    left: 17px;
+
+    height: 2px;
+    border-radius: 999px;
+
+    background: #6daee5;
+
+    content: "";
+}
+/* 搜索区域 */
+.site-search {
+    padding: 18px max(24px, calc((100% - 1120px) / 2));
+    background: #ffffff;
+    border-bottom: 1px solid var(--border);
+}
+
+/* 搜索表单 */
+.site-search form {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* 搜索关键词文字 */
+.site-search form > label {
+    font-weight: 600;
+}
+
+/* 搜索输入框 */
+.site-search input[type="search"] {
+    width: min(420px, 100%);
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+/* 鼠标点击搜索框 */
+.site-search input[type="search"]:focus {
+    background: #ffffff;
+    border-color: var(--primary);
+}
+
+/* 歌曲和歌手选项 */
+.site-search fieldset {
+    display: flex;
+    gap: 14px;
+    margin: 0;
+    padding: 5px 12px 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+/* 搜索按钮 */
+.site-search button {
+    padding: 10px 20px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #ffffff;
+    cursor: pointer;
+}
+
+/* 鼠标经过搜索按钮 */
+.site-search button:hover {
+    background: var(--primary-hover);
+}
+
+.page-shell {
+    width: min(1120px, calc(100% - 48px));
+    margin: 32px auto 64px;
+}
+
+.page-shell h1 {
+    margin: 0 0 24px;
+    font-size: 30px;
+}
+
+/*卡片网格样式模板*/
+/*卡片网格*/
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 20px;
+}
+
+/*卡片*/
+.media-card {
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+/*鼠标经过卡片*/
+.media-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(24, 33, 42, 0.12);
+}
+
+/*卡片图片*/
+.media-card-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+/*卡片文字区域*/
+.media-card-content {
+    padding: 16px;
+}
+
+/*歌曲和歌手名称*/
+.media-card-content h2,
+.media-card-content h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+}
+
+/*歌手名称等次要信息*/
+.media-card-content p {
+    margin: 0 0 12px;
+    color: var(--muted);
+}
+
+/*查看详情链接*/
+.media-card-content a {
+    display: inline-block;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/*鼠标经过详情链接*/
+.media-card-content a:hover {
+    text-decoration: underline;
+}
+
+
+/*分页样式模板*/
+.pagination {
+    display: grid;
+    gap: 14px;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.pagination-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pagination-link,
+.pagination-number,
+.pagination-current {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 11px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.pagination-link:hover,
+.pagination-number:hover {
+    border-color: var(--primary);
+    background: #eef6fc;
+}
+
+.pagination-link.is-disabled {
+    color: #9aa3ad;
+    background: #eef0f2;
+    cursor: not-allowed;
+}
+
+.pagination-summary {
+    margin: 0 6px;
+    color: var(--muted);
+}
+
+.pagination-numbers {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pagination-current {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.pagination-ellipsis {
+    padding: 0 4px;
+    color: var(--muted);
+}
+
+.pagination-jump {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-left: auto;
+}
+
+.pagination-jump input {
+    width: 70px;
+    height: 36px;
+    padding: 0 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+.pagination-jump button {
+    height: 36px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--primary);
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.pagination-jump button:hover {
+    background: var(--primary-hover);
+}
+
+/*歌曲和歌手详情页*/
+.detail-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 28px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+}
+
+.detail-image {
+    display: block;
+    width: 220px;
+    height: 220px;
+    flex: 0 0 220px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.detail-heading {
+    min-width: 0;
+}
+
+.detail-heading h1 {
+    margin: 0 0 20px;
+}
+
+.detail-line {
+    margin: 0 0 12px;
+}
+
+.detail-source {
+    overflow-wrap: anywhere;
+}
+
+.notice {
+    margin: 20px 0 0;
+    padding: 10px 14px;
+    border-left: 4px solid var(--danger);
+    background: #fff1f0;
+    color: var(--danger);
+}
+
+.detail-section {
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+
+.detail-section h2 {
+    margin: 0 0 18px;
+    font-size: 22px;
+}
+
+/*歌词区域*/
+.lyrics {
+    max-width: 760px;
+    padding: 24px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: var(--surface);
+}
+/*每一行歌词*/
+.lyrics p {
+    margin: 0 0 10px;
+    color: #3f4b57;
+    line-height: 1.8;
+}
+/*最后一行歌词不需要下边距*/
+.lyrics p:last-child {
+    margin-bottom: 0;
+}
+
+.info-list {
+    margin: 0;
+}
+
+.info-list div {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 18px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.info-list spz {
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.info-list hundred {
+    margin: 0;
+}
+
+.detail-prose {
+    max-width: 900px;
+    margin: 0;
+    line-height: 1.9;
+}
+
+.section-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.section-heading p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.media-card-content h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+/*评论区*/
+.comment-form {
+    display: grid;
+    gap: 10px;
+    max-width: 760px;
+    margin-bottom: 22px;
+}
+
+.comment-form label {
+    font-weight: 600;
+}
+
+.comment-form textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 10px 12px;
+    resize: vertical;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+}
+
+.primary-button {
+    width: fit-content;
+    padding: 9px 18px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--primary);
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    background: var(--primary-hover);
+}
+
+.comment-list {
+    display: grid;
+    gap: 12px;
+    max-width: 760px;
+}
+
+.comment-item {
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+}
+
+.comment-item p {
+    margin: 0 0 10px;
+}
+
+.comment-time {
+    color: var(--muted);
+}
+
+.comment-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.delete-form {
+    margin: 0;
+}
+
+.delete-button {
+    padding: 6px 12px;
+    border: 1px solid var(--danger);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--danger);
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background: #fff1f0;
+}

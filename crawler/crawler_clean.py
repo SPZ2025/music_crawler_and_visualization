@@ -7,12 +7,15 @@ import re
 import sys
 import os
 import asyncio
+from pathlib import Path
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
 
-with open("secret.txt", "r", encoding="utf-8") as file:
+
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+with open(PROJECT_DIR / "secret.txt", "r", encoding="utf-8") as file:
     cookies = file.read() 
 
 SINGER_LIST_URL = 'https://y.qq.com/n/ryqq_v2/singer_list'
@@ -45,9 +48,11 @@ COMMENT_LIMIT = 3
 SCROLL_TIMES = 4
 PAGE_GOTO_TIMEOUT_MS = 60000
 COMMENT_WAIT_TIMEOUT_MS = 15000
-QQ_MUSIC_PROFILE_DIR = "qq_music_profile"
-SINGERS_JSON_PATH = "data/singers.json"
-SONGS_JSON_PATH = "data/songs.json"
+SITE_DIR = PROJECT_DIR / "music_site"
+QQ_MUSIC_PROFILE_DIR = str(PROJECT_DIR / "qq_music_profile")
+SINGERS_JSON_PATH = str(SITE_DIR / "data" / "singers.json")
+SONGS_JSON_PATH = str(SITE_DIR / "data" / "songs.json")
+STATIC_IMAGES_DIR = SITE_DIR / "static" / "images"
 
 #清洗cookie（AIGC）
 def build_playwright_cookies(cookie_text):
@@ -179,7 +184,7 @@ def load_json_list(file_path):
 
 #即时保存函数
 def save_data(all_singers, all_songs):
-    os.makedirs("data", exist_ok=True)
+    os.makedirs(os.path.dirname(SINGERS_JSON_PATH), exist_ok=True)
     with open(SINGERS_JSON_PATH, "w", encoding="utf-8") as f:
         json.dump(all_singers, f, ensure_ascii=False, indent=2)
 
@@ -242,6 +247,44 @@ def extract_photo_url_song(html_text):
         url = "https:" + url
     return url
 
+#提取所有歌手的id和名字
+def extract_song_singers_from_soup(soup):
+    singers = []
+    seen = set()
+
+    for a in soup.find_all('a', class_='data__singer_txt', href=True):
+        href = a.get('href', '')
+        m = re.search(r'/singer/([a-zA-Z0-9]+)', href)
+        if not m:
+            continue
+
+        singer_id = m.group(1)
+        singer_name = a.get_text().strip()
+        if not singer_id or not singer_name or singer_id in seen:
+            continue
+
+        singers.append({
+            'singer_id': singer_id,
+            'singer_name': singer_name,
+        })
+        seen.add(singer_id)
+
+    return singers
+
+#写入歌曲字典
+def set_song_singer_fields(song_info, singers):
+    if not singers:
+        return False
+
+    singer_ids = [singer['singer_id'] for singer in singers]
+    singer_names = [singer['singer_name'] for singer in singers]
+
+    song_info['song_singer_id'] = singer_ids[0]
+    song_info['song_singer_ids'] = singer_ids
+    song_info['song_singer'] = ' / '.join(singer_names)
+    song_info['song_singers'] = singer_names
+    return True
+
 #歌词提取
 def fetch_lyric(songmid):
     lyric_url = "https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg"
@@ -289,13 +332,13 @@ def fetch_lyric(songmid):
     for line in text.splitlines():
         if re.match(r"^\[(ti|ar|al|by|offset):", line):
             continue
-        line = re.sub(r"\[\d{1,2}:\d{1,2}(?:\.\d{1,3})?\]", "", line).strip()
+        line = re.sub(r"\[(?:\d{1,2}:)?\d{1,2}:\d{1,2}(?:\.\d{1,3})?\]", "", line).strip()
         if line:
             lyrics.append(line)
     return lyrics
 
 
-# --------------------------------------------------
+# ------------------------------------------------------------------------
 #第一层：歌手列表
 #-------------------------------------------------------------------------
 def parse_singer_list_html(html_text, limit = SINGER_LIMIT):
@@ -373,8 +416,14 @@ def crawl_singer_info(singer_dic, limit = SINGER_LIMIT_PER_SINGER):
         if id in seen:
             continue
         seen.add(id)
-        songs.append({'song_id': id,
-                      'song_url': f'https://y.qq.com/n/ryqq_v2/songDetail/{id}'})
+        songs.append({
+            'song_id': id,
+            'song_url': f'https://y.qq.com/n/ryqq_v2/songDetail/{id}',
+            'song_singer_id': singer_dic['singer_id'],
+            'song_singer_ids': [singer_dic['singer_id']],
+            'song_singer': singer_dic['singer_name'],
+            'song_singers': [singer_dic['singer_name']],
+        })
         if len(songs) >= limit:
             break
         
@@ -398,12 +447,9 @@ def crawl_song_info(song_dic):
         song_title = h1.get_text().strip()
         song_info['song_title'] = song_title
     
-    a = soup.find('a', class_ = 'data__singer_txt', title = True)
-    if a is None:
+    song_singers = extract_song_singers_from_soup(soup)
+    if not set_song_singer_fields(song_info, song_singers):
         print("[警告] 没找到 song_singer_txt,页面结构可能变了,请重新用开发者工具确认。")
-    else:
-        song_singer = a.get_text().strip()
-        song_info['song_singer'] = song_singer
 
     
     photo_url = extract_photo_url_song(html_text)
@@ -428,12 +474,12 @@ def deal_singer_info(_singer_info):
         return {}
     image = fetch_image(photo_url)
 
-    image_dir = os.path.join("static", "images", "singers")
-    os.makedirs(image_dir, exist_ok= True)
-    image_path = os.path.join(image_dir, f"{_singer_info['singer_id']}.jpg")
+    image_dir = STATIC_IMAGES_DIR / "singers"
+    image_dir.mkdir(parents=True, exist_ok=True)
+    image_path = image_dir / f"{_singer_info['singer_id']}.jpg"
     image.save(image_path)
 
-    _singer_info["singer_photo_path"] = image_path
+    _singer_info["singer_photo_path"] = f"static/images/singers/{_singer_info['singer_id']}.jpg"
     return _singer_info
     
 def deal_song_info(_song_info):
@@ -443,15 +489,15 @@ def deal_song_info(_song_info):
         return {}
     image = fetch_image(photo_url)
 
-    image_dir = os.path.join("static", "images", "songs")
-    os.makedirs(image_dir, exist_ok= True)
-    image_path = os.path.join(image_dir, f"{_song_info['song_id']}.jpg")
+    image_dir = STATIC_IMAGES_DIR / "songs"
+    image_dir.mkdir(parents=True, exist_ok=True)
+    image_path = image_dir / f"{_song_info['song_id']}.jpg"
     image.save(image_path)
 
-    _song_info["song_photo_path"] = image_path
+    _song_info["song_photo_path"] = f"static/images/songs/{_song_info['song_id']}.jpg"
     return _song_info
 
-#主逻辑：过程中动态增添歌词
+#主逻辑：过程中动态增添评论
 async def main_logic_async():
     all_singers = load_json_list(SINGERS_JSON_PATH)
     all_songs = load_json_list(SONGS_JSON_PATH)
@@ -477,7 +523,7 @@ async def main_logic_async():
 
                 page = await context.new_page()
 
-                for singer_dic in singer_list:
+                for singer_dic in singer_list[240:]:
                     singer_id = singer_dic["singer_id"]
                     singer_exists = singer_id in crawled_singer_ids
                     if singer_exists:
@@ -521,6 +567,6 @@ async def main_logic_async():
 def main_logic():
     asyncio.run(main_logic_async())
 
-#运行！
+#运行！yeyeyeye
 if __name__ == "__main__":
     main_logic()

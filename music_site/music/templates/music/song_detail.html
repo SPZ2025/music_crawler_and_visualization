@@ -1,0 +1,120 @@
+{% extends "music/base.html" %}
+
+{% block title %}{{ song.song_title }}{% endblock %}
+
+{% block content %}
+        <section class="detail-header">
+            <img
+                class="detail-image"
+                src="/{{ song.song_photo_path }}"
+                alt="{{ song.song_title }}"
+            >
+
+            <div class="detail-heading">
+                <h1>{{ song.song_title }}</h1>
+
+                <p class="detail-line">
+                    <strong>歌手：</strong>
+                    {% if singers %}
+                        {% for singer in singers %}
+                            <a href="{% url 'singer_detail' singer.singer_id %}">
+                                {{ singer.singer_name }}
+                            </a>{% if not forloop.last %} / {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        暂无可跳转的歌手信息
+                    {% endif %}
+                </p>
+
+                <p class="detail-line">
+                    <strong>原始网站：</strong>
+                    <a
+                        class="detail-source"
+                        href="{{ song.song_url }}"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        {{ song.song_url }}
+                    </a>
+                </p>
+            </div>
+        </section>
+
+        {% if missing_singer_ids %}
+            <p class="notice">
+                以下歌手 ID 未在 singers.json 中找到：
+                {% for singer_id in missing_singer_ids %}
+                    {{ singer_id }}{% if not forloop.last %}、{% endif %}
+                {% endfor %}
+            </p>
+        {% endif %}
+
+        <section class="detail-section">
+            <h2>歌词</h2>
+
+            <div class="lyrics">
+                {% for line in song.song_lyrics %}
+                    <p>{{ line }}</p>
+                {% empty %}
+                    <p>暂无歌词</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="detail-section">
+            <h2>过往评论</h2>
+
+            <div class="comment-list">
+                {% for comment in song.song_comments %}
+                    <article class="comment-item">
+                        <p>{{ comment.comment_text }}</p>
+                        <small class="comment-time">{{ comment.comment_time }}</small>
+                    </article>
+                {% empty %}
+                    <p>暂无评论</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="detail-section">
+            <h2>用户评论</h2>
+
+            <form class="comment-form" method="post">
+                {% csrf_token %}
+                <label for="comment-content">发表评论</label>
+                <textarea
+                    id="comment-content"
+                    name="content"
+                    rows="4"
+                    placeholder="请输入你的评论"
+                    required
+                ></textarea>
+                <button class="primary-button" type="submit">提交评论</button>
+            </form>
+
+            <div class="comment-list">
+                {% for comment in comments %}
+                    <article class="comment-item">
+                        <p>{{ comment.content }}</p>
+
+                        <div class="comment-footer">
+                            <small class="comment-time">
+                                {{ comment.created_at|date:"Y-m-d H:i:s" }}
+                            </small>
+
+                            <form
+                                class="delete-form"
+                                method="post"
+                                action="{% url 'delete_comment' song.song_id comment.id %}"
+                            >
+                                {% csrf_token %}
+                                <button class="delete-button" type="submit">删除</button>
+                            </form>
+                        </div>
+                    </article>
+                {% empty %}
+                    <p>暂无用户评论</p>
+                {% endfor %}
+            </div>
+        </section>
+{% endblock %}

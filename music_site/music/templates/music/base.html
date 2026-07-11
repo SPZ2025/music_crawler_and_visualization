@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}音乐网站{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'music/theme.css' %}">
+    <script src="{% static 'music/script.js' %}" defer></script>
+</head>
+<body class=""site-body>
+    {% include "music/navigation.html" %}
+    {% include "music/search_form.html" %}
+
+    <main class="page-shell">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

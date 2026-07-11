@@ -1,0 +1,82 @@
+{% extends "music/base.html" %}
+
+{% block title %}歌曲列表{% endblock %}
+
+{% block content %}
+        <h1>歌曲列表</h1>
+
+        <section class="media-grid">
+            {% for song in page_obj %}
+                <article class="media-card">
+                    <img
+                        class="media-card-image"
+                        src="/{{ song.song_photo_path }}"
+                        alt="{{ song.song_title }}"
+                    >
+
+                    <div class="media-card-content">
+                        <h2>{{ song.song_title }}</h2>
+                        <p>{{ song.song_singer }}</p>
+
+                        <a href="{% url 'song_detail' song.song_id %}">
+                            查看歌曲详情
+                        </a>
+                    </div>
+                </article>
+            {% empty %}
+                <p>暂无歌曲数据</p>
+            {% endfor %}
+        </section>
+
+        <nav class="pagination" aria-label="歌曲列表分页">
+            <div class="pagination-row">
+                {% if page_obj.has_previous %}
+                    <a class="pagination-link" href="?page=1">首页</a>
+                    <a class="pagination-link" href="?page={{ page_obj.previous_page_number }}">上一页</a>
+                {% else %}
+                    <span class="pagination-link is-disabled">首页</span>
+                    <span class="pagination-link is-disabled">上一页</span>
+                {% endif %}
+
+                <span class="pagination-summary">
+                    第 {{ page_obj.number }} 页 / 共 {{ page_obj.paginator.num_pages }} 页
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a class="pagination-link" href="?page={{ page_obj.next_page_number }}">下一页</a>
+                    <a class="pagination-link" href="?page={{ page_obj.paginator.num_pages }}">尾页</a>
+                {% else %}
+                    <span class="pagination-link is-disabled">下一页</span>
+                    <span class="pagination-link is-disabled">尾页</span>
+                {% endif %}
+            </div>
+
+            <div class="pagination-row">
+                <div class="pagination-numbers">
+                    {% for page_number in displayed_page_range %}
+                        {% if page_number == page_obj.paginator.ELLIPSIS %}
+                            <span class="pagination-ellipsis">{{ page_number }}</span>
+                        {% elif page_number == page_obj.number %}
+                            <strong class="pagination-current">{{ page_number }}</strong>
+                        {% else %}
+                            <a class="pagination-number" href="?page={{ page_number }}">{{ page_number }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <form class="pagination-jump" method="get" action="">
+                    <label for="song-page-input">跳转到</label>
+                    <input
+                        id="song-page-input"
+                        type="number"
+                        name="page"
+                        min="1"
+                        max="{{ page_obj.paginator.num_pages }}"
+                        value="{{ page_obj.number }}"
+                    >
+                    <span>页</span>
+                    <button type="submit">跳转</button>
+                </form>
+            </div>
+        </nav>
+{% endblock %}

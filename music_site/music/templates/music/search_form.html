@@ -1,0 +1,41 @@
+<section class="site-search">
+    <form method="get" action="{% url 'search' %}">
+        <label for="global-search-input">搜索关键词</label>
+
+        <input
+            id="global-search-input"
+            type="search"
+            name="q"
+            value="{{ query|default:'' }}"
+            maxlength="20"
+            placeholder="请输入歌曲、歌手或歌词"
+            required
+        >
+
+        <fieldset>
+            <legend>搜索类型</legend>
+
+            <label>
+                <input
+                    type="radio"
+                    name="type"
+                    value="song"
+                    {% if search_type != "singer" %}checked{% endif %}
+                >
+                歌曲
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="type"
+                    value="singer"
+                    {% if search_type == "singer" %}checked{% endif %}
+                >
+                歌手
+            </label>
+        </fieldset>
+
+        <button type="submit">搜索</button>
+    </form>
+</section>

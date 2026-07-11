@@ -1,0 +1,101 @@
+{% extends "music/base.html" %}
+
+{% block title %}{{ singer.singer_name }}{% endblock %}
+
+{% block content %}
+        <section class="detail-header">
+            <img
+                class="detail-image"
+                src="/{{ singer.singer_photo_path }}"
+                alt="{{ singer.singer_name }}"
+            >
+
+            <div class="detail-heading">
+                <h1>{{ singer.singer_name }}</h1>
+
+                <p class="detail-line">
+                    <strong>原始网站：</strong>
+                    <a
+                        class="detail-source"
+                        href="{{ singer.singer_url }}"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        {{ singer.singer_url }}
+                    </a>
+                </p>
+            </div>
+        </section>
+
+        <section class="detail-section">
+            <h2>基本信息</h2>
+
+            <dl class="info-list">
+                <div>
+                    <spz>代表作</spz>
+                    <hundred>{{ singer.代表作|default:"暂无相关信息" }}</hundred>
+                </div>
+                <div>
+                    <spz>生日</spz>
+                    <hundred>{{ singer.生日|default:"暂无相关信息" }}</hundred>
+                </div>
+                <div>
+                    <spz>出生地</spz>
+                    <hundred>{{ singer.出生地|default:"暂无相关信息" }}</hundred>
+                </div>
+                <div>
+                    <spz>出道日期</spz>
+                    <hundred>{{ singer.出道日期|default:"暂无相关信息" }}</hundred>
+                </div>
+                <div>
+                    <spz>国籍</spz>
+                    <hundred>{{ singer.国籍|default:"暂无相关信息" }}</hundred>
+                </div>
+                <div>
+                    <spz>外文名</spz>
+                    <hundred>{{ singer.外文名|default:"暂无相关信息" }}</hundred>
+                </div>
+                <div>
+                    <spz>主要成就</spz>
+                    <hundred>{{ singer.主要成就|default:"暂无相关信息" }}</hundred>
+                </div>
+            </dl>
+        </section>
+
+        <section class="detail-section">
+            <h2>歌手简介</h2>
+
+            {% if singer.简介 %}
+                <p class="detail-prose">{{ singer.简介|linebreaksbr }}</p>
+            {% else %}
+                <p>暂无简介</p>
+            {% endif %}
+        </section>
+
+        <section class="detail-section">
+            <div class="section-heading">
+                <h2>该歌手的歌曲</h2>
+                <p>共 {{ singer_songs|length }} 首歌曲</p>
+            </div>
+
+            <div class="media-grid">
+                {% for song in singer_songs %}
+                    <article class="media-card">
+                        <img
+                            class="media-card-image"
+                            src="/{{ song.song_photo_path }}"
+                            alt="{{ song.song_title }}"
+                            loading="lazy"
+                        >
+
+                        <div class="media-card-content">
+                            <h3>{{ song.song_title }}</h3>
+                            <a href="{% url 'song_detail' song.song_id %}">查看歌曲详情</a>
+                        </div>
+                    </article>
+                {% empty %}
+                    <p>系统中暂无该歌手的歌曲。</p>
+                {% endfor %}
+            </div>
+        </section>
+{% endblock %}

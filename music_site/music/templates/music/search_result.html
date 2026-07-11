@@ -1,0 +1,127 @@
+{% extends "music/base.html" %}
+
+{% block title %}搜索结果{% endblock %}
+
+{% block content %}
+        <h1>音乐搜索</h1>
+
+        {% if error %}
+            <p>{{ error }}</p>
+
+        {% elif query %}
+            <section>
+                <h2>
+                    “{{ query }}”：
+                    {% if search_type != "song" %}
+                        歌手搜索结果
+                    {% else %}
+                        歌曲搜索结果
+                    {% endif %}
+                </h2>
+
+                <p>
+                    共找到 {{ result_count }} 条结果，
+                    后端搜索耗时 {{ elapsed_time|floatformat:4 }} 毫秒
+                </p>
+            </section>
+
+            <section class="media-grid" aria-label="搜索结果">
+                {% if search_type == "song" %}
+                    {% for song in page_obj %}
+                        <article class="media-card">
+                            <img
+                                class="media-card-image"
+                                src="/{{ song.song_photo_path }}"
+                                alt="{{ song.song_title }}"
+                                loading="lazy"
+                            >
+
+                            <div class="media-card-content">
+                                <h3>{{ song.song_title }}</h3>
+                                <p>{{ song.song_singer }}</p>
+                                <a href="{% url 'song_detail' song.song_id %}">查看歌曲详情</a>
+                            </div>
+                        </article>
+                    {% empty %}
+                        <p>没有找到相关歌曲。</p>
+                    {% endfor %}
+
+                {% else %}
+                    {% for singer in page_obj %}
+                        <article class="media-card">
+                            <img
+                                class="media-card-image"
+                                src="/{{ singer.singer_photo_path }}"
+                                alt="{{ singer.singer_name }}"
+                                loading="lazy"
+                            >
+
+                            <div class="media-card-content">
+                                <h3>{{ singer.singer_name }}</h3>
+                                <a href="{% url 'singer_detail' singer.singer_id %}">查看歌手详情</a>
+                            </div>
+                        </article>
+                    {% empty %}
+                        <p>没有找到相关歌手。</p>
+                    {% endfor %}
+                {% endif %}
+            </section>
+        {% endif %}
+
+        {% if query and not error and page_obj.paginator.num_pages > 1 %}
+            <nav class="pagination" aria-label="搜索结果分页">
+                <div class="pagination-row">
+                    {% if page_obj.has_previous %}
+                        <a class="pagination-link" href="?q={{ query|urlencode }}&type={{ search_type }}&page=1">首页</a>
+                        <a class="pagination-link" href="?q={{ query|urlencode }}&type={{ search_type }}&page={{ page_obj.previous_page_number }}">上一页</a>
+                    {% else %}
+                        <span class="pagination-link is-disabled">首页</span>
+                        <span class="pagination-link is-disabled">上一页</span>
+                    {% endif %}
+
+                    <span class="pagination-summary">
+                        第 {{ page_obj.number }} 页 / 共 {{ page_obj.paginator.num_pages }} 页
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a class="pagination-link" href="?q={{ query|urlencode }}&type={{ search_type }}&page={{ page_obj.next_page_number }}">下一页</a>
+                        <a class="pagination-link" href="?q={{ query|urlencode }}&type={{ search_type }}&page={{ page_obj.paginator.num_pages }}">尾页</a>
+                    {% else %}
+                        <span class="pagination-link is-disabled">下一页</span>
+                        <span class="pagination-link is-disabled">尾页</span>
+                    {% endif %}
+                </div>
+
+                <div class="pagination-row">
+                    <div class="pagination-numbers">
+                        {% for page_number in displayed_page_range %}
+                            {% if page_number == page_obj.paginator.ELLIPSIS %}
+                                <span class="pagination-ellipsis">{{ page_number }}</span>
+                            {% elif page_number == page_obj.number %}
+                                <strong class="pagination-current">{{ page_number }}</strong>
+                            {% else %}
+                                <a class="pagination-number" href="?q={{ query|urlencode }}&type={{ search_type }}&page={{ page_number }}">{{ page_number }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <form class="pagination-jump" method="get" action="{% url 'search' %}">
+                        <input type="hidden" name="q" value="{{ query }}">
+                        <input type="hidden" name="type" value="{{ search_type }}">
+
+                        <label for="search-page-input">跳转到</label>
+                        <input
+                            id="search-page-input"
+                            type="number"
+                            name="page"
+                            min="1"
+                            max="{{ page_obj.paginator.num_pages }}"
+                            value="{{ page_obj.number }}"
+                        >
+                        <span>页</span>
+                        <button type="submit">跳转</button>
+                    </form>
+                </div>
+            </nav>
+        {% endif %}
+{% endblock %}

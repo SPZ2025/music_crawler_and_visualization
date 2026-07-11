@@ -1,0 +1,44 @@
+<header class="site-header">
+    <nav class="site-nav" aria-label="主导航">
+        <a class="site-brand" href="{% url 'song_list' %}">
+            <span class="site-brand-mark" aria-hidden="true">M</span>
+
+            <span class="site-brand-text">
+                <strong>Muse</strong>
+                <small>音乐馆</small>
+            </span>
+        </a>
+
+        <div class="site-nav-links">
+            <a
+                href="{% url 'song_list' %}"
+                {% if request.resolver_match.url_name == "song_list" %}
+                    class="is-active"
+                    aria-current="page"
+                {% endif %}
+            >
+                歌曲
+            </a>
+
+            <a
+                href="{% url 'singer_list' %}"
+                {% if request.resolver_match.url_name == "singer_list" %}
+                    class="is-active"
+                    aria-current="page"
+                {% endif %}
+            >
+                歌手
+            </a>
+
+            <a
+                href="{% url 'search' %}"
+                {% if request.resolver_match.url_name == "search" %}
+                    class="is-active"
+                    aria-current="page"
+                {% endif %}
+            >
+                搜索
+            </a>
+        </div>
+    </nav>
+</header>

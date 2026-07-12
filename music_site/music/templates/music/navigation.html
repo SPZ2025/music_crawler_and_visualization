@@ -1,7 +1,7 @@
 <header class="site-header">
-    <nav class="site-nav" aria-label="主导航">
+    <nav class="site-nav">
         <a class="site-brand" href="{% url 'song_list' %}">
-            <span class="site-brand-mark" aria-hidden="true">M</span>
+            <span class="site-brand-mark">M</span>
 
             <span class="site-brand-text">
                 <strong>Muse</strong>
@@ -14,7 +14,6 @@
                 href="{% url 'song_list' %}"
                 {% if request.resolver_match.url_name == "song_list" %}
                     class="is-active"
-                    aria-current="page"
                 {% endif %}
             >
                 歌曲
@@ -24,7 +23,6 @@
                 href="{% url 'singer_list' %}"
                 {% if request.resolver_match.url_name == "singer_list" %}
                     class="is-active"
-                    aria-current="page"
                 {% endif %}
             >
                 歌手
@@ -34,7 +32,6 @@
                 href="{% url 'search' %}"
                 {% if request.resolver_match.url_name == "search" %}
                     class="is-active"
-                    aria-current="page"
                 {% endif %}
             >
                 搜索

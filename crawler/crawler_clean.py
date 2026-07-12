@@ -54,7 +54,7 @@ SINGERS_JSON_PATH = str(SITE_DIR / "data" / "singers.json")
 SONGS_JSON_PATH = str(SITE_DIR / "data" / "songs.json")
 STATIC_IMAGES_DIR = SITE_DIR / "static" / "images"
 
-#清洗cookie（AIGC）
+#处理cookie，后面给playwright用
 def build_playwright_cookies(cookie_text):
     playwright_cookies = []
     for item in cookie_text.split(";"):
@@ -197,20 +197,13 @@ def fetch_text(url):
         response = requests.get(url, headers=headers, proxies={}, timeout=10)
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        if response.status_code in (401, 403):
-            print(f"[致命错误] 请求被拒绝(状态码{response.status_code})，Cookie 可能已失效")
-            print("请重新从浏览器复制登录后的 Cookie，更新 secret.txt 后重试")
-            sys.exit(1)
         raise
     response.encoding = response.apparent_encoding or 'utf-8'
     return response.text
 def fetch_image(url):
     response = requests.get(url, headers=headers, proxies={}, timeout=10)
     response.raise_for_status()
-    try:
-       image = Image.open(BytesIO(response.content))
-    except Exception as e:
-       raise ValueError(f"无法解析图片: {e}")
+    image = Image.open(BytesIO(response.content))
     return image
 
 #照片链接提取
@@ -223,10 +216,8 @@ def extract_photo_url_singer(html_text):
     if not m:
         return ""
     raw_value = m.group(1)
-    try:
-        url = json.loads(f'"{raw_value}"')
-    except json.JSONDecodeError:
-        return ""
+    
+    url = json.loads(f'"{raw_value}"')
     if url.startswith("//"):
         url = "https:" + url
     return url
@@ -239,10 +230,8 @@ def extract_photo_url_song(html_text):
     if not m:
         return "" 
     raw_value = m.group(1)
-    try:
-        url = json.loads(f'"{raw_value}"')
-    except json.JSONDecodeError:
-        return ""
+    
+    url = json.loads(f'"{raw_value}"')
     if url.startswith("//"):
         url = "https:" + url
     return url

@@ -6,3 +6,8 @@ pandas
 playwright
 notebook
 ipykernel
+django
+matplotlib
+numpy
+jieba
+scikit-learn
